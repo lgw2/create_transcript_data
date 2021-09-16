@@ -4,7 +4,8 @@ updates by me (Lucy).
 It takes an input gene transfer format (GTF) file and writes the associated
 splice graphs for each gene on the positive strand (note: I don't really
 understand the positive strand stuff, but basically we only look at lines from
-the input file with a `+`) in GFA format.
+the input file with a `+`) in GFA format. (Is it exactly GFA format? Maybe this
+doesn't matter.)
 
 For example, running
 
@@ -19,6 +20,7 @@ weight. The nodes are are genomic coordinate ranges, e.g.,
 `(1479049,1479108)`. The second file gives true sequence of nodes for each
 transcript.
 
-Not yet implemented: `input_and_truth_from_gtf.py` will take in a parameter
-saying how to simulate weights for the transcripts. Then, the output files will
+`input_and_truth_from_gtf.py` also simulates
+weights for the transcripts using the [Numpy lognormal
+distribution](https://numpy.org/doc/stable/reference/random/generated/numpy.random.lognormal.html). Then, the output files will
 have weighted edges and ground truth paths based on these simulated weights.

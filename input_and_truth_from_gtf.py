@@ -1,6 +1,7 @@
 import networkx as nx
 from os import mkdir
 import argparse
+import numpy as np
 
 
 parser = argparse.ArgumentParser()
@@ -83,6 +84,11 @@ def group_data(data):
 
 
 data = group_data(data)
+
+# at this point, let's add cov values.
+for chromosome in data:
+    for transcript in data[chromosome]:
+        data[chromosome][transcript]['cov'] = np.random.lognormal(-4, 1)
 
 
 def add_pseudo_exons(sequence):
