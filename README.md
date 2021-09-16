@@ -6,11 +6,15 @@ Requirements:
 The script `input_and_truth_from_gtf.py` was originally written by Ariel with
 updates by me (Lucy).
 
+The input GTF file for humans can be downloaded from [http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/]
+by clicking the `Homo_sapiens.GRCh38.104.gtf.gz`. A small version of this file
+is included in the repository as `small_human.gtf`.
+
+
 It takes an input gene transfer format (GTF) file and writes the associated
-splice graphs for each gene on the positive strand (note: I don't really
+splice graphs and paths for each gene on the positive strand (note: I don't really
 understand the positive strand stuff, but basically we only look at lines from
-the input file with a `+`) in GFA format. (Is it exactly GFA format? Maybe this
-doesn't matter.)
+the input file with a `+`).
 
 For example, running
 
