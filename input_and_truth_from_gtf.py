@@ -1,8 +1,15 @@
 import networkx as nx
 from os import mkdir
+import argparse
 
 
-input_gtf = open('human.gtf', 'r').read().split('\n')
+parser = argparse.ArgumentParser()
+parser.add_argument("input_filename", type=str)
+args = parser.parse_args()
+filename = args.input_filename
+# assume input filename is a .gtf file
+dir_to_write = filename.split('.gtf')[0]
+input_gtf = open(filename, 'r').read().split('\n')
 input_gtf = list(filter(lambda line: not line.startswith('#') and
                         line, input_gtf))
 
@@ -252,11 +259,13 @@ def store_transcripts_to_truth_file(filename, components):
 
 
 try:
-    mkdir('./human')
+    mkdir(dir_to_write)
 except FileExistsError:
     pass
 
+# "sequence" actually refers to the chromosome I believe
 for sequence in data:
     components = build_splicing_graphs(data[sequence])
-    store_components_to_gfa(f'./human/{sequence}.gfa', components)
-    store_transcripts_to_truth_file(f'./human/{sequence}.truth', components)
+    store_components_to_gfa(f'./{dir_to_write}/{sequence}.gfa', components)
+    store_transcripts_to_truth_file(f'./{dir_to_write}/{sequence}.truth',
+                                    components)
