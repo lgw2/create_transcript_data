@@ -6,7 +6,7 @@ Requirements:
 The script `input_and_truth_from_gtf.py` was originally written by Ariel with
 updates by me (Lucy).
 
-The input GTF file for humans can be downloaded from [http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/]
+The input GTF file for humans can be downloaded from http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/
 by clicking the `Homo_sapiens.GRCh38.104.gtf.gz`. A small version of this file
 is included in the repository as `small_human.gtf`.
 
