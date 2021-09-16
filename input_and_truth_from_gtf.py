@@ -6,6 +6,8 @@ import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument("input_filename", type=str)
+parser.add_argument('--simulate_cov', dest='simulate_cov',
+                    default=False, action='store_true')
 args = parser.parse_args()
 filename = args.input_filename
 # assume input filename is a .gtf file
@@ -86,9 +88,10 @@ def group_data(data):
 data = group_data(data)
 
 # at this point, let's add cov values.
-for chromosome in data:
-    for transcript in data[chromosome]:
-        data[chromosome][transcript]['cov'] = np.random.lognormal(-4, 1)
+if args.simulate_cov:
+    for chromosome in data:
+        for transcript in data[chromosome]:
+            data[chromosome][transcript]['cov'] = np.random.lognormal(-4, 4)
 
 
 def add_pseudo_exons(sequence):
