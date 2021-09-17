@@ -74,7 +74,14 @@ transcript. For a larger input file, there will be GFA and truth files for each
 chromosome. This process will work for both annotation files (type 1 above, for
 example the one from
 ensemble) and assemblies (type 2 above, for example the one produce by
-stringtie). Type 2 already have coverage values. We may want to simulate
+stringtie). For example, the following works for a GTF file assembled with
+stringtie:
+
+```
+input_and_truth_from_gtf.py small_SRR307903_assembly.gtf
+```
+
+Type 2 inputs already have coverage values. We may want to simulate
 coverages for type 1 as described in the next paragraph.
 
 `input_and_truth_from_gtf.py` can  also simulate
