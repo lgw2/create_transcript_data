@@ -1,4 +1,4 @@
-### Requirements:
+### Requirements
 * Python 3+
 * numpy
 * networkx
@@ -12,21 +12,50 @@ splice graphs and paths for each gene on the positive strand (note: I don't real
 understand the positive strand stuff, but basically we only look at lines from
 the input file with a `+`).
 
+#### More about the input files
+
 We are concerned with two types of inputs:
-* transcripts from the [human gene annotation](http://www.ensembl.org/Homo_sapiens/Info/Annotation)
+1. transcripts from the [human gene annotation](http://www.ensembl.org/Homo_sapiens/Info/Annotation)
 with simulated abundances.
-* transcripts and abundances built from real reads from experiments stored in the [Sequence
+2. transcripts and abundances built from real reads from experiments stored in the [Sequence
 	Read Archive](https://www.ncbi.nlm.nih.gov/sra) using existing
 	state-of-the-art transcript assembly pipelines, e.g., [Hisat2](http://daehwankimlab.github.io/hisat2/) for read
 	alignment and [StringTie](https://ccb.jhu.edu/software/stringtie/) for transcript assembly.
 
-
-The input GTF file for humans can be downloaded from http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/
-by clicking the `Homo_sapiens.GRCh38.104.gtf.gz`. A small version of this file
+For type 1 data,
+an input GTF file for humans can be downloaded from http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/
+by clicking the `Homo_sapiens.GRCh38.104.gtf.gz`. A smaller test version of this file
 is included in the repository as `small_human.gtf`.
 
+For type 2 data, there are a number of steps needed to create a GTF from the
+reads. In the future maybe we will automate this process. For now, here is a
+summary of the pipeline for reads in SRA accession number SRR307903 along with
+commands to run. (Note that the programs would be need to installed before
+running the commands.)
 
-For example, running
+1. Download SRA archive file from https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR307903
+2. Use `fastq-dump` from the SRA Toolkit to extract two `fastq` files files from the SRA archive file (two files because paired-end reads)
+```
+fastq-dump -I --split-files SRR307903
+```
+3. Download pre-built GRCh38 index from https://daehwankimlab.github.io/hisat2/download/#h-sapiens. I used the genome_snp_tran, but maybe I should have used a different one.
+4. Use `hisat2` with the two `fastq` files and the pre-built index to produce a sam file.
+```
+hisat2 -p 6 -x ../grch38_snp_tran/genome_snp_tran -1 SRR307903_1.fastq -2 SRR307903_2.fastq -S aligned_reads.sam
+```
+5. Use `samtools` to convert the `sam` file to a `bam` file and then to a sorted `bam` file.
+```
+samtools view -bS aligned_reads.sam > aligned_reads.bam
+samtools sort eg1.bam -o aligned_reads_sorted.bam
+```
+6. Run `stringtie` on the aligned, sorted reads in the sorted `bam` file.
+```
+stringtie -o assembly.gtf aligned_reads_sorted.bam
+```
+
+#### How to run
+
+Running
 
 ```
 input_and_truth_from_gtf.py small_human.gtf
