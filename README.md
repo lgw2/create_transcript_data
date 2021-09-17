@@ -1,20 +1,30 @@
-Requirements:
+### Requirements:
 * Python 3+
 * numpy
 * networkx
 
+### About
+
 The script `input_and_truth_from_gtf.py` was originally written by Ariel with
 updates by me (Lucy).
+It takes an input gene transfer format (GTF) file and writes the associated
+splice graphs and paths for each gene on the positive strand (note: I don't really
+understand the positive strand stuff, but basically we only look at lines from
+the input file with a `+`).
+
+We are concerned with two types of inputs:
+* transcripts from the [human gene annotation](http://www.ensembl.org/Homo_sapiens/Info/Annotation)
+with simulated abundances.
+* transcripts and abundances built from real reads from experiments stored in the [Sequence
+	Read Archive](https://www.ncbi.nlm.nih.gov/sra) using existing
+	state-of-the-art transcript assembly pipelines, e.g., [Hisat2](http://daehwankimlab.github.io/hisat2/) for read
+	alignment and [StringTie](https://ccb.jhu.edu/software/stringtie/) for transcript assembly.
+
 
 The input GTF file for humans can be downloaded from http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/
 by clicking the `Homo_sapiens.GRCh38.104.gtf.gz`. A small version of this file
 is included in the repository as `small_human.gtf`.
 
-
-It takes an input gene transfer format (GTF) file and writes the associated
-splice graphs and paths for each gene on the positive strand (note: I don't really
-understand the positive strand stuff, but basically we only look at lines from
-the input file with a `+`).
 
 For example, running
 
