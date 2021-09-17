@@ -1,3 +1,9 @@
+###
+
+Things that may still need to be changed:
+* adding source/sink nodes to the graphs in case not all transcripts start and
+end at the same exon/pseudoexon
+
 ### Requirements
 * Python 3+
 * numpy
@@ -11,8 +17,6 @@ It takes an input gene transfer format (GTF) file and writes the associated
 splice graphs and paths for each gene on the positive strand (note: I don't really
 understand the positive strand stuff, but basically we only look at lines from
 the input file with a `+`).
-
-#### More about the input files
 
 We are concerned with two types of inputs:
 1. transcripts from the [human gene annotation](http://www.ensembl.org/Homo_sapiens/Info/Annotation)
@@ -53,7 +57,7 @@ samtools sort eg1.bam -o aligned_reads_sorted.bam
 stringtie -o assembly.gtf aligned_reads_sorted.bam
 ```
 
-#### How to run
+### How to run
 
 Running
 
@@ -66,7 +70,12 @@ will create a directory called `small_human` with two files: `1.gfa` and
 gene in `small_human.gtf` in GFA format, which is a list of edges, each with a
 weight. The nodes are are genomic coordinate ranges, e.g.,
 `(1479049,1479108)`. The second file gives true sequence of nodes for each
-transcript.
+transcript. For a larger input file, there will be GFA and truth files for each
+chromosome. This process will work for both annotation files (type 1 above, for
+example the one from
+ensemble) and assemblies (type 2 above, for example the one produce by
+stringtie). Type 2 already have coverage values. We may want to simulate
+coverages for type 1 as described in the next paragraph.
 
 `input_and_truth_from_gtf.py` can  also simulate
 weights for the transcripts using the [Numpy lognormal
@@ -79,3 +88,8 @@ This can be done using the `--simulate_cov` flag. For example:
 ```
 input_and_truth_from_gtf.py small_human.gtf --simulate_cov
 ```
+
+### Pre-computed outputs
+
+If you just want outputs from the two data sets described above, they are at
+https://drive.google.com/drive/folders/11bRstTOTOTsYbcRgqiZ7BLAf85SlFXI2?usp=sharing.
