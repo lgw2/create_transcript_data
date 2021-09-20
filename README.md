@@ -70,7 +70,8 @@ will create a directory called `small_human` with two files: `1.sg` and
 gene in `small_human.gtf` in what we are calling sg format, which is a list of edges, each with a
 weight. The nodes are are genomic coordinate ranges, e.g.,
 `(1479049,1479108)`. The second file gives true sequence of nodes for each
-transcript. For a larger input file, there will be GFA and truth files for each
+transcript. See `small_human/1.sg` and `small_human/1.truth` for examples.
+For a larger input file, there will be GFA and truth files for each
 chromosome. This process will work for both annotation files (type 1 above, for
 example the one from
 ensemble) and assemblies (type 2 above, for example the one produce by
@@ -91,6 +92,9 @@ distribution](https://numpy.org/doc/stable/reference/random/generated/numpy.rand
 default setting for the
 [RNA-Seq reads
 simulator](http://alumni.cs.ucr.edu/~liw/rnaseqreadsimulator.html).
+We also multiply these by 1000, because they tend to be close to zero, but the
+catfish inputs have weights ranging from 1 to in the tens of thousands (from
+what I remember).
 Then, the output files will
 have weighted edges and ground truth paths based on these simulated weights.
 This can be done using the `--simulate_cov` flag. For example:
@@ -112,6 +116,6 @@ https://drive.google.com/drive/folders/11bRstTOTOTsYbcRgqiZ7BLAf85SlFXI2?usp=sha
 The commands to create these files are
 ```
 python input_and_truth_from_gtf.py human.gtf --simulate_cov
-python input_and_truth_from_gtf.py SRR397903_assembly.gtf
+python input_and_truth_from_gtf.py SRR307903_assembly.gtf
 ```
 
