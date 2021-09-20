@@ -65,20 +65,21 @@ Running
 input_and_truth_from_gtf.py small_human.gtf
 ```
 
-will create a directory called `small_human` with two files: `1.gfa` and
+will create a directory called `small_human` with two files: `1.sg` and
 `1.truth`. The first contains the splice graphs for all transcripts for each
-gene in `small_human.gtf` in GFA format, which is a list of edges, each with a
+gene in `small_human.gtf` in what we are calling sg format, which is a list of edges, each with a
 weight. The nodes are are genomic coordinate ranges, e.g.,
 `(1479049,1479108)`. The second file gives true sequence of nodes for each
 transcript. For a larger input file, there will be GFA and truth files for each
 chromosome. This process will work for both annotation files (type 1 above, for
 example the one from
 ensemble) and assemblies (type 2 above, for example the one produce by
-stringtie). For example, the following works for a GTF file assembled with
+stringtie).
+For example, the following works for a GTF file assembled with
 stringtie:
 
 ```
-input_and_truth_from_gtf.py small_SRR307903_assembly.gtf
+python input_and_truth_from_gtf.py small_SRR307903_assembly.gtf
 ```
 
 Type 2 inputs already have coverage values. We may want to simulate
@@ -88,15 +89,29 @@ coverages for type 1 as described in the next paragraph.
 weights for the transcripts using the [Numpy lognormal
 distribution](https://numpy.org/doc/stable/reference/random/generated/numpy.random.lognormal.html) with a mean of -4 and variance of 4, as in the
 default setting for the
-[RNA-Seq reads simulator](http://alumni.cs.ucr.edu/~liw/rnaseqreadsimulator.html)
+[RNA-Seq reads
+simulator](http://alumni.cs.ucr.edu/~liw/rnaseqreadsimulator.html).
 Then, the output files will
 have weighted edges and ground truth paths based on these simulated weights.
 This can be done using the `--simulate_cov` flag. For example:
 ```
-input_and_truth_from_gtf.py small_human.gtf --simulate_cov
+python input_and_truth_from_gtf.py small_human.gtf --simulate_cov
 ```
+
+### A note on coverage values
+
+Coverage values are rounded to the nearest integer. If that integer is zero, the
+path is not included in the ground truth. No zero-weight edges are written to
+the `sg` file, either.
 
 ### Pre-computed outputs
 
 If you just want outputs from the two data sets described above, they are at
 https://drive.google.com/drive/folders/11bRstTOTOTsYbcRgqiZ7BLAf85SlFXI2?usp=sharing.
+
+The commands to create these files are
+```
+python input_and_truth_from_gtf.py human.gtf --simulate_cov
+python input_and_truth_from_gtf.py SRR397903_assembly.gtf
+```
+

@@ -91,7 +91,14 @@ data = group_data(data)
 if args.simulate_cov:
     for chromosome in data:
         for transcript in data[chromosome]:
-            data[chromosome][transcript]['cov'] = np.random.lognormal(-4, 4)
+            data[chromosome][transcript]['cov'] =\
+                1000 * np.random.lognormal(-4, 4)
+
+# if coverages are non-integer, round
+for chromosome in data:
+    for transcript in data[chromosome]:
+        data[chromosome][transcript]['cov'] =\
+            round(data[chromosome][transcript]['cov'])
 
 
 def add_pseudo_exons(sequence):
@@ -216,9 +223,9 @@ def build_splicing_graphs(sequence):
     return components
 
 
-# Write in a single file all components in gfa format
-def store_components_to_gfa(filename, components):
-    output_gfa = open(filename, 'w')
+# Write in a single file all components in sg format
+def store_components_to_sg(filename, components):
+    output_sg = open(filename, 'w')
 
     graph_number = 0
     for component in components:
@@ -231,16 +238,17 @@ def store_components_to_gfa(filename, components):
             name = ','.join(list(map(lambda transcript:
                                      transcript['transcript_id'],
                                      transcripts)))
-            output_gfa.write(
+            output_sg.write(
                 f'H # graph number = {graph_number} name = {name}\n')
 
             for edge in graph.edges:
                 cov = graph.edges[edge]['cov']
-                output_gfa.write(
-                    f'L\t({edge[0][0]},{edge[0][1]})\t+\t({edge[1][0]},{edge[1][1]})\t+\t{cov}\n') # noqa
+                if cov > 0:
+                    output_sg.write(
+                        f'L\t({edge[0][0]},{edge[0][1]})\t+\t({edge[1][0]},{edge[1][1]})\t+\t{cov}\n') # noqa
 
             graph_number += 1
-    output_gfa.close()
+    output_sg.close()
 
 
 # Write in a single file all truth graphs in catfish's format
@@ -261,7 +269,9 @@ def store_transcripts_to_truth_file(filename, components):
 
             for transcript in transcripts:
                 cov = transcript['cov']
-                output_truth_file.write(f'{cov} {" ".join(list(map(lambda p_exon: f"({p_exon[0]},{p_exon[1]})", transcript["pseudo_exons"])))}\n') # noqa
+                # don't write weight 0 paths
+                if cov > 0:
+                    output_truth_file.write(f'{cov} {" ".join(list(map(lambda p_exon: f"({p_exon[0]},{p_exon[1]})", transcript["pseudo_exons"])))}\n') # noqa
 
             graph_number += 1
     output_truth_file.close()
@@ -275,6 +285,6 @@ except FileExistsError:
 # "sequence" actually refers to the chromosome I believe
 for sequence in data:
     components = build_splicing_graphs(data[sequence])
-    store_components_to_gfa(f'./{dir_to_write}/{sequence}.gfa', components)
+    store_components_to_sg(f'./{dir_to_write}/{sequence}.sg', components)
     store_transcripts_to_truth_file(f'./{dir_to_write}/{sequence}.truth',
                                     components)
