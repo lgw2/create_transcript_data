@@ -1,9 +1,3 @@
-###
-
-Things that may still need to be changed:
-* adding source/sink nodes to the graphs in case not all transcripts start and
-end at the same exon/pseudoexon
-
 ### Requirements
 * Python 3+
 * numpy
@@ -69,7 +63,9 @@ will create a directory called `small_human` with two files: `1.sg` and
 `1.truth`. The first contains the splice graphs for all transcripts for each
 gene in `small_human.gtf` in what we are calling sg format, which is a list of edges, each with a
 weight. The nodes are are genomic coordinate ranges, e.g.,
-`(1479049,1479108)`. The second file gives true sequence of nodes for each
+`(1479049,1479108)`. We add an edge from the source `(0,0)` to the first node
+in each transcript an from the last node to the sink `(-1,-1)`.
+The second file gives true sequence of nodes for each
 transcript. See `small_human/1.sg` and `small_human/1.truth` for examples.
 For a larger input file, there will be GFA and truth files for each
 chromosome. This process will work for both annotation files (type 1 above, for

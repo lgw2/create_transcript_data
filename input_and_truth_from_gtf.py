@@ -2,6 +2,11 @@ import networkx as nx
 from os import mkdir
 import argparse
 import numpy as np
+from collections import defaultdict
+
+
+SOURCE = (0, 0)
+SINK = (-1, -1)
 
 
 parser = argparse.ArgumentParser()
@@ -218,6 +223,10 @@ def build_splicing_graphs(sequence):
             transcripts_component += transcripts_starting_at[vertex]
 
         component_dict['transcripts'] = transcripts_component
+
+        # add an edge from source to first pseudo exon and from last pseudo
+        # exon to sink for this component
+        # component_dict['graph'].add_edge(SOURCE,
         components.append(component_dict)
 
     return components
@@ -246,6 +255,21 @@ def store_components_to_sg(filename, components):
                 if cov > 0:
                     output_sg.write(
                         f'L\t({edge[0][0]},{edge[0][1]})\t+\t({edge[1][0]},{edge[1][1]})\t+\t{cov}\n') # noqa
+            # add edges from source to start pseudo exons and end pseudo
+            # exons to sink
+            new_edges = defaultdict(int)
+            for transcript in component['transcripts']:
+                # print(f"{transcript['pseudo_exons'][0]}...{transcript['pseudo_exons'][-1]}, # {transcript['cov']}") # noqa
+                new_edges[(SOURCE, transcript['pseudo_exons'][0])] +=\
+                    transcript['cov']
+                new_edges[(transcript['pseudo_exons'][-1], SINK)] +=\
+                    transcript['cov']
+            for edge in new_edges:
+                u = edge[0]
+                v = edge[1]
+                cov = new_edges[edge]
+                if cov > 0:
+                    output_sg.write(f'L\t({u[0]},{u[1]})\t+\t({v[0]},{v[1]})\t+\t{cov}\n') # noqa
 
             graph_number += 1
     output_sg.close()
@@ -268,10 +292,14 @@ def store_transcripts_to_truth_file(filename, components):
                 f'# graph number = {graph_number} name = {name}\n')
 
             for transcript in transcripts:
+                # make a temp version of pseudo_exons with source and sink
+                temp_pseudo_exons = transcript["pseudo_exons"]
+                temp_pseudo_exons.insert(0, SOURCE)
+                temp_pseudo_exons.append(SINK)
                 cov = transcript['cov']
                 # don't write weight 0 paths
                 if cov > 0:
-                    output_truth_file.write(f'{cov} {" ".join(list(map(lambda p_exon: f"({p_exon[0]},{p_exon[1]})", transcript["pseudo_exons"])))}\n') # noqa
+                    output_truth_file.write(f'{cov} {" ".join(list(map(lambda p_exon: f"({p_exon[0]},{p_exon[1]})", temp_pseudo_exons)))}\n') # noqa
 
             graph_number += 1
     output_truth_file.close()
