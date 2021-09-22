@@ -232,6 +232,27 @@ def build_splicing_graphs(sequence):
     return components
 
 
+def check_flow(graph, transcripts):
+    sources_and_sinks = set()
+    for transcript in transcripts:
+        source = transcript["pseudo_exons"][0]
+        sink = transcript["pseudo_exons"][-1]
+        sources_and_sinks.add(source)
+        sources_and_sinks.add(sink)
+    weights = nx.get_edge_attributes(graph, "cov")
+    for node in graph.nodes():
+        if node not in sources_and_sinks:
+            out_edges = graph.out_edges(node)
+            out_weight = 0
+            for edge in out_edges:
+                out_weight += weights[edge]
+            in_edges = graph.in_edges(node)
+            in_weight = 0
+            for edge in in_edges:
+                in_weight += weights[edge]
+            assert out_weight == in_weight
+
+
 # Write in a single file all components in sg format
 def store_components_to_sg(filename, components):
     output_sg = open(filename, 'w')
@@ -240,6 +261,7 @@ def store_components_to_sg(filename, components):
     for component in components:
         graph = component['graph']
         transcripts = component['transcripts']
+        check_flow(graph, transcripts)
         # Only store graph with at least one transcript of length > 1
         if len(list(filter(lambda transcript:
                            len(transcript['pseudo_exons']) > 1,
