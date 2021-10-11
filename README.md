@@ -51,6 +51,13 @@ samtools sort eg1.bam -o aligned_reads_sorted.bam
 stringtie -o assembly.gtf aligned_reads_sorted.bam
 ```
 
+### Filtering out funnel graphs
+
+(Funnels)[https://arxiv.org/pdf/1801.10401.pdf] are DAGs that are trivial to
+decompose (all paths are safe). We may want to remove these from our datastets.
+Using the flag `--filter-funnels` will create inputs and groundtruth files with
+funnels filtered out.
+
 ### How to run
 
 Running
@@ -112,6 +119,7 @@ https://drive.google.com/drive/folders/11bRstTOTOTsYbcRgqiZ7BLAf85SlFXI2?usp=sha
 The commands to create these files are
 ```
 python input_and_truth_from_gtf.py human.gtf --simulate_cov
+python input_and_truth_from_gtf.py human.gtf --simulate_cov --filter-funnels
 python input_and_truth_from_gtf.py SRR307903_assembly.gtf
 ```
 

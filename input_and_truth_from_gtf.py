@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("input_filename", type=str)
 parser.add_argument('--simulate_cov', dest='simulate_cov',
                     default=False, action='store_true')
+parser.add_argument('--filter-funnels', dest='filter_funnels',
+                    default=False, action='store_true')
 args = parser.parse_args()
 filename = args.input_filename
 # assume input filename is a .gtf file
@@ -253,8 +255,34 @@ def check_flow(graph, transcripts):
             assert out_weight == in_weight
 
 
+def is_forking_vertex(G, v):
+    return G.out_degree(v) > 1
+
+
+def is_reached_by_merging_vertex(G, v, reached_by_merging_vertex):
+    in_neighbors = list(G.predecessors(v))
+
+    if len(in_neighbors) == 1:
+        return reached_by_merging_vertex[in_neighbors[0]]
+
+    return len(in_neighbors) > 1
+
+
+def is_funnel(G):  # G is assumed to be a DAG
+
+    reached_by_merging_vertex = {v: False for v in G.nodes}
+
+    for v in nx.topological_sort(G):
+        reached_by_merging_vertex[v] =\
+            is_reached_by_merging_vertex(G, v, reached_by_merging_vertex)
+        if reached_by_merging_vertex[v] and is_forking_vertex(G, v):
+            return False
+
+    return True
+
+
 # Write in a single file all components in sg format
-def store_components_to_sg(filename, components):
+def store_components_to_sg(filename, components, filter_funnels):
     output_sg = open(filename, 'w')
 
     graph_number = 0
@@ -266,6 +294,10 @@ def store_components_to_sg(filename, components):
         if len(list(filter(lambda transcript:
                            len(transcript['pseudo_exons']) > 1,
                            transcripts))) > 0:
+            if filter_funnels:
+                # check whether this graph is a funnel
+                if is_funnel(graph):
+                    continue  # skip this instance
             name = ','.join(list(map(lambda transcript:
                                      transcript['transcript_id'],
                                      transcripts)))
@@ -298,7 +330,7 @@ def store_components_to_sg(filename, components):
 
 
 # Write in a single file all truth graphs in catfish's format
-def store_transcripts_to_truth_file(filename, components):
+def store_transcripts_to_truth_file(filename, components, filter_funnels):
     output_truth_file = open(filename, 'w')
 
     graph_number = 0
@@ -307,6 +339,10 @@ def store_transcripts_to_truth_file(filename, components):
         # Only store graph with at least one transcript of length > 1
         if len(list(filter(lambda transcript: len(transcript['pseudo_exons'])
                            > 1, transcripts))) > 0:
+            if filter_funnels:
+                # check whether this graph is a funnel
+                if is_funnel(component['graph']):
+                    continue  # skip this instance
             name = ','.join(list(map(lambda transcript:
                                      transcript['transcript_id'],
                                      transcripts)))
@@ -335,6 +371,7 @@ except FileExistsError:
 # "sequence" actually refers to the chromosome I believe
 for sequence in data:
     components = build_splicing_graphs(data[sequence])
-    store_components_to_sg(f'./{dir_to_write}/{sequence}.sg', components)
+    store_components_to_sg(f'./{dir_to_write}/{sequence}.sg', components,
+                           args.filter_funnels)
     store_transcripts_to_truth_file(f'./{dir_to_write}/{sequence}.truth',
-                                    components)
+                                    components, args.filter_funnels)
