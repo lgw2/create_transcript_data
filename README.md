@@ -111,6 +111,20 @@ Coverage values are rounded to the nearest integer. If that integer is zero, the
 path is not included in the ground truth. No zero-weight edges are written to
 the `sg` file, either.
 
+### Filtering funnels from catfish data
+
+There is a script called `filter_funnels_from_catfish_data.py` that takes a
+direcotry of catfish files and an output directory and writes the original
+catfish files to the output directory, but with all funnel instances removed.
+
+For example, if `human_catfish` is a directory of catfish files (`.graph` and
+`.truth`), then running
+
+```
+python filter_funnels_from_catfish_data.py human_catfish output
+```
+filters funnels.
+
 ### Pre-computed outputs
 
 If you just want outputs from the two data sets described above, they are at
