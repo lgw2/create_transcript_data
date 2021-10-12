@@ -137,3 +137,12 @@ python input_and_truth_from_gtf.py human.gtf --simulate_cov --filter-funnels
 python input_and_truth_from_gtf.py SRR307903_assembly.gtf
 ```
 
+There are also pre-computed catfish files with funnels removed. The commands to
+create those are
+
+```
+python filter_funnels_from_catfish_data.py human_catfish human_catfish_no_funnels
+python filter_funnels_from_catfish_data.py mouse mouse_no_funnels
+python filter_funnels_from_catfish_data.py salmon salmon_no_funnels
+python filter_funnels_from_catfish_data.py zebrafish zebrafish_no_funnels
+```
