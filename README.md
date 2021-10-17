@@ -116,6 +116,12 @@ the seed. For example,
 python input_and_truth_from_gtf.py small_human.gtf --simulate_cov --seed 10
 ```
 
+### Catfish format
+
+If we need inputs in catfish format (with integer node ids in a valid
+topological order) we can use the `--catfish_format` option. It currently does
+NOT write the groundtruth file in the same format.
+
 ### A note on coverage values
 
 Coverage values are rounded to the nearest integer. If that integer is zero, the
@@ -158,7 +164,7 @@ python filter_funnels_from_catfish_data.py salmon salmon_no_funnels
 python filter_funnels_from_catfish_data.py zebrafish zebrafish_no_funnels
 ```
 
-### Pre-computed outputs for safe FD paper
+### Pre-computed outputs for ILP FD paper
 
 Can be found at
 https://drive.google.com/drive/folders/15l1lhTRVNG_2tFUZtmwSZJvv2YG_HY-k?usp=sharing.

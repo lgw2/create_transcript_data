@@ -306,29 +306,56 @@ def store_components_to_sg(filename, components, filter_funnels):
             name = ','.join(list(map(lambda transcript:
                                      transcript['transcript_id'],
                                      transcripts)))
-            output_sg.write(
-                f'H # graph number = {graph_number} name = {name}\n')
+            if args.catfish_format:
+                output_sg.write(
+                    f'# graph number = {graph_number} name = {name}\n')
+            else:
+                output_sg.write(
+                    f'H # graph number = {graph_number} name = {name}\n')
+
+            if args.catfish_format:
+                topo_sort = list(nx.topological_sort(graph))
+                sink = len(list(topo_sort)) + 1
+                output_sg.write(f'{sink + 1}\n')
+                mapping = dict(zip(list(topo_sort),
+                                   range(1, sink)))
+                graph = nx.relabel_nodes(graph, mapping, copy=True)
 
             for edge in graph.edges:
                 cov = graph.edges[edge]['cov']
                 if cov > 0:
-                    output_sg.write(
-                        f'L\t({edge[0][0]},{edge[0][1]})\t+\t({edge[1][0]},{edge[1][1]})\t+\t{cov}\n') # noqa
+                    if args.catfish_format:
+                        output_sg.write(
+                            f'{edge[0]} {edge[1]} {cov}\n') # noqa
+                    else:
+                        output_sg.write(
+                            f'L\t({edge[0][0]},{edge[0][1]})\t+\t({edge[1][0]},{edge[1][1]})\t+\t{cov}\n') # noqa
             # add edges from source to start pseudo exons and end pseudo
             # exons to sink
             new_edges = defaultdict(int)
             for transcript in component['transcripts']:
                 # print(f"{transcript['pseudo_exons'][0]}...{transcript['pseudo_exons'][-1]}, # {transcript['cov']}") # noqa
-                new_edges[(SOURCE, transcript['pseudo_exons'][0])] +=\
-                    transcript['cov']
-                new_edges[(transcript['pseudo_exons'][-1], SINK)] +=\
-                    transcript['cov']
+                if args.catfish_format:
+                    new_edges[(0, mapping[transcript['pseudo_exons'][0]])] +=\
+                        transcript['cov']
+                    new_edges[(mapping[transcript['pseudo_exons'][-1]],
+                               sink)] +=\
+                        transcript['cov']
+                else:
+                    new_edges[(SOURCE, transcript['pseudo_exons'][0])] +=\
+                        transcript['cov']
+                    new_edges[(transcript['pseudo_exons'][-1], SINK)] +=\
+                        transcript['cov']
+            print(new_edges)
             for edge in new_edges:
                 u = edge[0]
                 v = edge[1]
                 cov = new_edges[edge]
                 if cov > 0:
-                    output_sg.write(f'L\t({u[0]},{u[1]})\t+\t({v[0]},{v[1]})\t+\t{cov}\n') # noqa
+                    if args.catfish_format:
+                        output_sg.write(f'{u} {v} {cov}\n') # noqa
+                    else:
+                        output_sg.write(f'L\t({u[0]},{u[1]})\t+\t({v[0]},{v[1]})\t+\t{cov}\n') # noqa
 
             graph_number += 1
     output_sg.close()
@@ -376,7 +403,11 @@ except FileExistsError:
 # "sequence" actually refers to the chromosome I believe
 for sequence in data:
     components = build_splicing_graphs(data[sequence])
-    store_components_to_sg(f'./{dir_to_write}/{sequence}.sg', components,
-                           args.filter_funnels)
+    if args.catfish_format:
+        file_extension = 'graph'
+    else:
+        file_extension = 'sg'
+    store_components_to_sg(f'./{dir_to_write}/{sequence}.{file_extension}',
+                           components, args.filter_funnels)
     store_transcripts_to_truth_file(f'./{dir_to_write}/{sequence}.truth',
                                     components, args.filter_funnels)
