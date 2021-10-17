@@ -136,7 +136,7 @@ python filter_funnels_from_catfish_data.py human_catfish output
 ```
 filters funnels.
 
-### Pre-computed outputs
+### Pre-computed outputs for safe FD paper
 
 If you just want outputs from the two data sets described above, they are at
 https://drive.google.com/drive/folders/11bRstTOTOTsYbcRgqiZ7BLAf85SlFXI2?usp=sharing.
@@ -157,3 +157,17 @@ python filter_funnels_from_catfish_data.py mouse mouse_no_funnels
 python filter_funnels_from_catfish_data.py salmon salmon_no_funnels
 python filter_funnels_from_catfish_data.py zebrafish zebrafish_no_funnels
 ```
+
+### Pre-computed outputs for safe FD paper
+
+Can be found at
+https://drive.google.com/drive/folders/15l1lhTRVNG_2tFUZtmwSZJvv2YG_HY-k?usp=sharing.
+They are generated using these commands:
+
+```
+python input_and_truth_from_gtf.py human.gtf --simulate_cov --seed 10 --catfish_format
+python input_and_truth_from_gtf.py small_SRR307903_assembly.gtf --catfish_format
+```
+
+Note that these outputs are then used as inputs to create subpath constraint
+datasets and inexact flow datasets as described [here](https://github.com/msu-alglab/coaster-experiments).
