@@ -58,6 +58,7 @@ decompose (all paths are safe). We may want to remove these from our datastets.
 Using the flag `--filter-funnels` will create inputs and groundtruth files with
 funnels filtered out.
 
+
 ### How to run
 
 Running
@@ -105,6 +106,16 @@ This can be done using the `--simulate_cov` flag. For example:
 python input_and_truth_from_gtf.py small_human.gtf --simulate_cov
 ```
 
+### Setting a random seed
+
+We can provide a seed to fix the simulated coverages to be the same over
+multiple runs. This is done with the `--seed` option followed by an integer for
+the seed. For example,
+
+```
+python input_and_truth_from_gtf.py small_human.gtf --simulate_cov --seed 10
+```
+
 ### A note on coverage values
 
 Coverage values are rounded to the nearest integer. If that integer is zero, the
@@ -132,8 +143,8 @@ https://drive.google.com/drive/folders/11bRstTOTOTsYbcRgqiZ7BLAf85SlFXI2?usp=sha
 
 The commands to create these files are
 ```
-python input_and_truth_from_gtf.py human.gtf --simulate_cov
-python input_and_truth_from_gtf.py human.gtf --simulate_cov --filter-funnels
+python input_and_truth_from_gtf.py human.gtf --simulate_cov --seed 10
+python input_and_truth_from_gtf.py human.gtf --simulate_cov --filter-funnels --seed 10
 python input_and_truth_from_gtf.py SRR307903_assembly.gtf
 ```
 

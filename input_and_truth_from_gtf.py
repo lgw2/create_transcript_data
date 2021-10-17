@@ -13,6 +13,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("input_filename", type=str)
 parser.add_argument('--simulate_cov', dest='simulate_cov',
                     default=False, action='store_true')
+parser.add_argument('--catfish_format', dest='catfish_format',
+                    default=False, action='store_true')
+parser.add_argument('--seed', type=int, required=False)
 parser.add_argument('--filter-funnels', dest='filter_funnels',
                     default=False, action='store_true')
 args = parser.parse_args()
@@ -95,6 +98,8 @@ def group_data(data):
 data = group_data(data)
 
 # at this point, let's add cov values.
+if args.seed:
+    np.random.seed(args.seed)
 if args.simulate_cov:
     for chromosome in data:
         for transcript in data[chromosome]:
