@@ -346,7 +346,6 @@ def store_components_to_sg(filename, components, filter_funnels):
                         transcript['cov']
                     new_edges[(transcript['pseudo_exons'][-1], SINK)] +=\
                         transcript['cov']
-            print(new_edges)
             for edge in new_edges:
                 u = edge[0]
                 v = edge[1]
