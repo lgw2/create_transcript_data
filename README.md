@@ -166,7 +166,7 @@ They are generated using these commands:
 
 ```
 python input_and_truth_from_gtf.py human.gtf --simulate_cov --seed 10 --catfish_format
-python input_and_truth_from_gtf.py small_SRR307903_assembly.gtf --catfish_format
+python input_and_truth_from_gtf.py SRR307903_assembly.gtf --catfish_format
 ```
 
 Note that these outputs are then used as inputs to create subpath constraint
