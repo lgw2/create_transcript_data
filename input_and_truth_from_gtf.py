@@ -295,10 +295,13 @@ def store_components_to_sg(filename, components, filter_funnels):
         graph = component['graph']
         transcripts = component['transcripts']
         check_flow(graph, transcripts)
-        # Only store graph with at least one transcript of length > 1
-        if len(list(filter(lambda transcript:
-                           len(transcript['pseudo_exons']) > 1,
-                           transcripts))) > 0:
+        # Only store graph with at least one transcript of length > 1 whose
+        # coverage is also greater than 0
+        num_transcripts = len(list(filter(lambda transcript:
+                                          len(transcript['pseudo_exons']) > 1,
+                                          transcripts)))
+        total_cov = sum([x["cov"] for x in transcripts])
+        if num_transcripts > 0 and total_cov > 0:
             if filter_funnels:
                 # check whether this graph is a funnel
                 if is_funnel(graph):
@@ -367,9 +370,14 @@ def store_transcripts_to_truth_file(filename, components, filter_funnels):
     graph_number = 0
     for component in components:
         transcripts = component['transcripts']
-        # Only store graph with at least one transcript of length > 1
-        if len(list(filter(lambda transcript: len(transcript['pseudo_exons'])
-                           > 1, transcripts))) > 0:
+        graph = component['graph']
+        # Only store graph with at least one transcript of length > 1 whose
+        # coverage is also greater than 0
+        num_transcripts = len(list(filter(lambda transcript:
+                                          len(transcript['pseudo_exons']) > 1,
+                                          transcripts)))
+        total_cov = sum([x["cov"] for x in transcripts])
+        if num_transcripts > 0 and total_cov > 0:
             if filter_funnels:
                 # check whether this graph is a funnel
                 if is_funnel(component['graph']):
@@ -380,6 +388,13 @@ def store_transcripts_to_truth_file(filename, components, filter_funnels):
             output_truth_file.write(
                 f'# graph number = {graph_number} name = {name}\n')
 
+            if args.catfish_format:
+                topo_sort = list(nx.topological_sort(graph))
+                sink = len(list(topo_sort)) + 1
+                mapping = dict(zip(list(topo_sort),
+                                   range(1, sink)))
+                graph = nx.relabel_nodes(graph, mapping, copy=True)
+
             for transcript in transcripts:
                 # make a temp version of pseudo_exons with source and sink
                 temp_pseudo_exons = transcript["pseudo_exons"]
@@ -388,7 +403,14 @@ def store_transcripts_to_truth_file(filename, components, filter_funnels):
                 cov = transcript['cov']
                 # don't write weight 0 paths
                 if cov > 0:
-                    output_truth_file.write(f'{cov} {" ".join(list(map(lambda p_exon: f"({p_exon[0]},{p_exon[1]})", temp_pseudo_exons)))}\n') # noqa
+                    if args.catfish_format:
+                        mid_edges = " ".join(
+                            list(map(lambda p_exon:
+                                     f"{mapping[p_exon]}",
+                                     temp_pseudo_exons[1:-1])))
+                        output_truth_file.write(f'{cov} {0} {mid_edges} {sink}\n') # noqa
+                    else:
+                        output_truth_file.write(f'{cov} {" ".join(list(map(lambda p_exon: f"({p_exon[0]},{p_exon[1]})", temp_pseudo_exons)))}\n') # noqa
 
             graph_number += 1
     output_truth_file.close()
