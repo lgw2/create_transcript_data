@@ -304,7 +304,15 @@ def store_components_to_sg(filename, components, filter_funnels):
         if num_transcripts > 0 and total_cov > 0:
             if filter_funnels:
                 # check whether this graph is a funnel
-                if is_funnel(graph):
+                # TODO: do this based on coverage values, not just all of the
+                # transcripts
+                # build temporary graph using only cov>0 edges to test funnel
+                new_graph = nx.DiGraph()
+                for edge in graph.edges():
+                    cov = graph.edges[edge]['cov']
+                    if cov > 0:
+                        new_graph.add_edge(edge[0], edge[1])
+                if is_funnel(new_graph):
                     continue  # skip this instance
             name = ','.join(list(map(lambda transcript:
                                      transcript['transcript_id'],
