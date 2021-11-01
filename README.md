@@ -176,4 +176,5 @@ python input_and_truth_from_gtf.py SRR307903_assembly.gtf --catfish_format
 ```
 
 Note that these outputs are then used as inputs to create subpath constraint
-datasets and inexact flow datasets as described [here](https://github.com/msu-alglab/coaster-experiments).
+datasets and inexact flow datasets as described [here](https://github.com/msu-alglab/coaster-experiments)
+and [here](https://github.com/msu-alglab/inexact-flows), respectively.
