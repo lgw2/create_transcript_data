@@ -387,8 +387,15 @@ def store_transcripts_to_truth_file(filename, components, filter_funnels):
         total_cov = sum([x["cov"] for x in transcripts])
         if num_transcripts > 0 and total_cov > 0:
             if filter_funnels:
+                new_graph = nx.DiGraph()
+                for edge in graph.edges():
+                    cov = graph.edges[edge]['cov']
+                    if cov > 0:
+                        new_graph.add_edge(edge[0], edge[1])
+                if is_funnel(new_graph):
+                    continue  # skip this instance
                 # check whether this graph is a funnel
-                if is_funnel(component['graph']):
+                if is_funnel(new_graph):
                     continue  # skip this instance
             name = ','.join(list(map(lambda transcript:
                                      transcript['transcript_id'],
